@@ -16,7 +16,7 @@ Odoo automatically select how products are selected for orders:
 
    * -
      - FIFO
-     - LIFO
+     - :doc:`LIFO <lifo>`
      - FEFO
      - Closest Location
      - Least Packages
