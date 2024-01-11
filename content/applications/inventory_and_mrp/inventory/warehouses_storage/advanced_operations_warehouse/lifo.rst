@@ -5,7 +5,7 @@ LIFO removal
 The *Last In, First Out* (LIFO) removal strategy picks the **newest** products on-hand, based on the
 date they entered a warehouse's stock.
 
-Every time an order is placed for products with the :abbr:`LIFO (Last In, First Out)` method, a
+Every time an order is placed for products using the :abbr:`LIFO (Last In, First Out)` strategy, a
 transfer is created for the lot/serial number that has most recently entered the stock (the **last**
 lot/serial number that entered the warehouse's inventory).
 
@@ -14,8 +14,8 @@ lot/serial number that entered the warehouse's inventory).
    potentially result in old, expired, or obsolete products being delivered to customers.
 
 Consider the following example, with the product, `Cinder Block`, which is tracked :guilabel:`By
-Lots` in the :guilabel:`Inventory` tab of the product form. Its product category's :guilabel:`Force
-Removal Strategy` is set to :guilabel:`Last In, First Out (LIFO)`.
+Lots` in the :guilabel:`Inventory` tab of the product form. The :guilabel:`Force
+Removal Strategy`  for the cinder block's product category is set to :guilabel:`Last In, First Out (LIFO)`.
 
 .. seealso::
    - :ref:`Set up force removal strategy <inventory/warehouses_storage/removal-config>`
