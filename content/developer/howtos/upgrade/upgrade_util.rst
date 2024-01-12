@@ -58,130 +58,226 @@ Now, the helper functions are available to be called through `util`.
 Util functions
 ==============
 
-The util package provides many useful functions to ease the upgrade process. Here, we will describe
-some of the most useful ones. You can find them by going to the `upgrade-util repository
-<https://github.com/odoo/upgrade-util/tree/master/src/util>`_.
-
-.. todo:: Check how to add technical information
-.. Link like official Odoo doc, to repo and auto-generated ?
-
-.. todo:: How to display the information?
-.. todo:: What functions to show?
+The util package provides many useful functions to ease the upgrade process. Here, we describe some
+of the most useful ones. Refer to the `upgrade-util repository
+<https://github.com/odoo/upgrade-util/tree/master/src/util>`_ for the comprehensive declaration of
+helper functions.
 
 Fields
 ------
 
-- remove_field
-- move_field_to_module
-- rename_field
-- convert_field_to_html
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/fields.py#L91>`_
+.. method:: remove_field(cr, model, fieldname[, cascade=False][, drop_column=True][, skip_inherit=()])
+
+   Remove a field and its references from the database
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str model: The field's model name
+   :param str fieldname: The field's name
+   :param bool cascade: If True, removes field's column and inheritance in CASCADE
+   :param bool drop_column: If True, drops the field's column
+   :param list(str) or str skip_inherit: list of models whose field's inheritance is skipped.
+      Use `"*"` to skip all inheritances
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/fields.py#L362>`_
+.. method:: rename_field(cr, model, old, new[, update_references=True][, domain_adapter=None][, skip_inherit=()])
+
+   Rename a field and its references from `old` to `new`
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str model: The field's model name
+   :param str old: The field's current name
+   :param str new: The field's new name
+   :param bool update_references: If True, Replace all references of field `old` to `new` in:
+      `ir_filters`, `ir_exports_line`, `ir_act_server`, `mail_alias`, `ir_ui_view_custom
+      (dashboard)`, `domains (using "domain_adapter")`, `related fields`
+   :param function domain_adapter: function that takes three arguments and returns a domain that
+      substitutes the original leaf: (leaf: Tuple[str,str,Any], in_or: bool, negated: bool) ->
+      List[Union[str,Tuple[str,str,Any]]]
+   :param list(str) or str skip_inherit: list of models whose field's inheritance is skipped.
+      Use `"*"` to skip all inheritances
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/fields.py#L337>`_
+.. method:: move_field_to_module(cr, model, fieldname, old_module, new_module[, skip_inherit=()])
+
+   Move a field's refenrence in `ir_model_data` table from one `old_module` to `new_module`
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str model: The field's model name
+   :param str fieldname: The field's name
+   :param str old_module: The field's current module name
+   :param str new_module: The field's new module name
+   :param list(str) or str skip_inherit: list of models whose field's inheritance is skipped.
+      Use `"*"` to skip all inheritances
 
 Models
 ------
 
-- remove_model
-- rename_model
-- merge_model
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/models.py#L53>`_
+.. method:: remove_model(cr, model[, drop_table=True][, ignore_m2m=()]):
+
+   Remove a model and its references from the database
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str model: The model name
+   :param bool drop_table: If True, drops the model's table
+   :param list(str) or str ignore_m2m: list of m2m tables ignored to remove. Use `"*"` to ignore all
+      m2m tables.
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/models.py#L203>`_
+.. method:: rename_model(cr, old, new[, rename_table=True])
+
+   Rename a model and its references from `old` to `new`
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str old: The model's current name
+   :param str new: The model's new name
+   :param bool rename_table: If True, renames the model's table
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/models.py#L323>`_
+.. method:: merge_model(cr, source, target[, drop_table=True][, fields_mapping=None][, ignore_m2m=()])
+
+   Merge the references from `source` model into `target` model and removes `source` model and its
+   references. By default, only the fields with the same name in both models are mapped.
+
+   .. warning::
+      This function does not move the records from `source` model to `target` model.
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str source: The source model's name
+   :param str target: The target model's name
+   :param bool drop_table: If True, drops the source model's table
+   :param dict fields_mapping: Dictionary mapping fields with different names on both models.
+      The format of the dictionary is::
+
+         {
+            "source_model_field_1": "target_model_field_1",
+            "source_model_field_2": "target_model_field_2",
+            ...
+         }
+   :param list(str) or str ignore_m2m: list of m2m tables ignored to remove from source model.
 
 Modules
 -------
 
-- remove_module
-- rename_module
-- merge_module
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/modules.py#L218>`_
+.. method:: remove_module(cr, module):
+
+   Uninstall and remove a module and its references from the database
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str module: The module name
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/modules.py#L263>`_
+.. method:: rename_module(cr, old, new)
+
+   Rename a module and its references from `old` to `new`
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str old: The module's current name
+   :param str new: The module's new name
+
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/modules.py#L323>`_
+.. method:: merge_module(cr, old, into, update_dependers=True)
+
+   Move all references of module `old` into module `into`
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str old: The source model's name
+   :param str into: The target model's name
+   :param bool update_dependers: If True, updates the dependencies of modules that depends on `old`
 
 ORM
 ---
 
-- env
-- recompute_fields
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/orm.py#L43>`_
+.. method:: env(cr)
 
-Misc
-----
+   Create a new environment from cursor.
 
-- skippable_cm
+   .. warning::
+      This function does NOT empty the cache maintained on the cursor for superuser with and empty
+      environment. A call to invalidate_cache will most probably be necessary every time you
+      directly modify something in database
 
-PostgreSQL
-----------
+   :param cr: Database cursor. Use the one from the migration script
+   :return: The new environment
+   :rtype: odoo.api.Environment
 
-- parallel_execute
-- explode_query_range
-- create_column
-- column_exists
-- remove_column
-- table_exists
-- create_index
-- rename_table
-- create_m2m
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/orm.py#L218>`_
+.. method:: recompute_fields(cr, model, fields[, ids=None][, logger=_logger][, chunk_size=256][, strategy="auto"])
+
+   Recompute field values.
+
+   :param cr: Database cursor. Use the one from the migration script
+   :param str model: The fields' model name
+   :param list(str) fields: List of fields to recompute
+   :param list(int) ids: List of records' IDs to recompute
+   :param Logger logger: Logger used to print the progress of the function
+   :param int chunk_size: Size of the chunk used to split the records fof better processing
+   :param str strategy: Strategy used to process the recomputation. Default: `auto`.
+      Possible values:
+
+      - `flush`: Flush the recomputation as when it's finished
+      - `commit`: Commit the recomputation as when it's finished
+      - `auto`: The function chooses the best alternative for the recomputation based on the number
+        of records to recompute and the fields traceability.
 
 Records
 -------
 
-- remove_record
-- remove_menus
-- remove_group
-- rename_xmlid
-- ref
-- ensure_xmlid_match_record
-- update_record_from_xml
-- reset_cowed_views
-- convert_jinja_to_qweb
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/records.py#L612>`_
+.. method:: ref(cr, xmlid)
 
-.. tabs::
+   Return the id corresponding to the given `xml_id`.
 
-   .. tab:: Fields
+   :param cr: Database cursor. Use the one from the migration script
+   :param str xml_id: Record xml_id, under the format `<module.id>`
+   :return: Found record id or None
+   :rtype: int
 
-      - remove_field
-      - move_field_to_module
-      - rename_field
-      - convert_field_to_html
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/records.py#L281>`_
+.. method:: remove_record(cr, name)
 
-   .. tab:: Models
+   Remove a record and its references corresponding to the given `xml_id`.
 
-      :attr:`remove_model`
-         remove_model explanation
-      :attr:`rename_model`
-         rename_model explanation
-      :attr:`merge_model`
-         merge_model explanation
+   :param cr: Database cursor. Use the one from the migration script
+   :param str name: record xml_id, under the format `<module.id>`
 
-   .. tab:: Modules
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/records.py#L548>`_
+.. method:: rename_xmlid(cr, old, new[, noupdate=None][, on_collision="fail"])
 
-      - remove_module
-      - rename_module
-      - merge_module
+   Rename the external Identifier of a record.
 
-   .. tab:: ORM
+   :param cr: Database cursor. Use the one from the migration script
+   :param str old: Record's current xml_id, under the format `<module.id>`
+   :param str new: Record's new xml_id, under the format `<module.id>`
+   :param bool noupdate: Value to set on the ir_model_data record `noupdate` field. Default: `None`
+   :param str on_collision: Action to take if the new xml_id already exists. Default: `fail`
 
-      - env
-      - recompute_fields
+      - `fail`: Flush the recomputation as when it's finished
+      - `merge`: Commit the recomputation as when it's finished
 
-   .. tab:: Misc
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/records.py#L652>`_
+.. method:: ensure_xmlid_match_record(cr, xmlid, model, values)
 
-      - skippable_cm
+   .. todo:: Complete
 
-   .. tab:: PostgreSQL
+   :param cr: Database cursor. Use the one from the migration script
+   :param str xmlid: Record xml_id, under the format `<module.id>`
+   :param str model: Record's model name
+   :param dict values: 
 
-      - parallel_execute
-      - explode_query_range
-      - create_column
-      - column_exists
-      - remove_column
-      - table_exists
-      - create_index
-      - rename_table
-      - create_m2m
+.. `[source] <https://github.com/odoo/upgrade-util/blob/master/src/util/records.py#L720>`_
+.. method:: update_record_from_xml(cr, xmlid[, reset_write_metadata=True][, force_create=False][, from_module=None][, reset_translations=()])
 
-   .. tab:: Records
+   .. todo:: Complete
 
-      - remove_record
-      - remove_menus
-      - remove_group
-      - rename_xmlid
-      - ref
-      - ensure_xmlid_match_record
-      - update_record_from_xml
-      - reset_cowed_views
-      - convert_jinja_to_qweb
-
-.. todo:: Add examples 
+   :param cr: Database cursor. Use the one from the migration script
+   :param str xmlid: The record's current xml_id, under the format `<module.id>`
+   :param bool reset_write_metadata: If True, the metadata before the record update is kept.
+      Default: `True`
+   :param bool force_create: If True, creates the record if it does not exist. Default: `False`
+   :param str from_module: Update the record base on a module different than the one referenced in
+      the xml_id. Useful when the record is inherited in another module.
+   :param set of str reset_translations: Set of field names which translations get reset.
