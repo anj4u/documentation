@@ -1,6 +1,9 @@
-==========================================
-Geo IP Installation (On-Premises Database)
-==========================================
+======
+Geo IP
+======
+
+.. note::
+   This documentation only applies to On-premise databases.
 
 Installation
 ============
@@ -35,8 +38,16 @@ Installation
 Test GeoIP Geolocation In Odoo Website
 ======================================
 
+<<<<<<< HEAD:content/applications/websites/website/configuration/on-premise_geo-ip-installation.rst
 Edit a web page to include some geo-ip information such as the country name of the current
 request IP address. To do so:
+||||||| parent of 87cc5a705 (temp):content/applications/websites/website/configuration/on-premise_geo-ip-installation.rst
+How To Test GeoIP Geolocation In Your Odoo Website
+==================================================
+=======
+How to test GeoIP geolocation in your Odoo website
+==================================================
+>>>>>>> 87cc5a705 (temp):content/administration/install/geo_ip.rst
 
 #. Go to your website. Open the web page that you want to test ``GeoIP``.
 #. Choose :menuselection:`Customize --> HTML/CSS/JS Editor`.
@@ -48,7 +59,15 @@ request IP address. To do so:
 
 #. Save and refresh the page.
 
+<<<<<<< HEAD:content/applications/websites/website/configuration/on-premise_geo-ip-installation.rst
 Geo-ip is working if you read your country name displayed in bold in the middle of the page.
+||||||| parent of 87cc5a705 (temp):content/applications/websites/website/configuration/on-premise_geo-ip-installation.rst
+.. image:: on-premise_geo-ip-installation/on-premise_geo-ip-installation01.png
+    :align: center
+=======
+.. image:: geo_ip/on-premise_geo-ip-installation01.png
+    :align: center
+>>>>>>> 87cc5a705 (temp):content/administration/install/geo_ip.rst
 
 In case you read "**geoip failure**" instead then the geolocalization failed. The common causes are:
 
